@@ -181,3 +181,123 @@ def tf():
         columns = tfidf.get_feature_names())
     # view feature matrix as a dataframe
     return dtm.head()
+
+### OBJECTIVE 02- QUERY DOCUMENTS
+### BY SIMILARITY
+
+'''Overview'''
+'''In the first objective in this
+module, we learned how to make vectors
+from text. But now, what do we do with
+the vectors? It turns out we can do much
+more valuable things in natural language
+processing and beyond when we have our
+info in numeric form. Of course, vectors
+are just vectors, and so the usual
+mathematical operations apply. So, we'l
+first review a bit of linear algebra
+and then look at some examples with
+actual text vectors.'''
+
+'''Vector Spaces'''
+'''A vector space is the number of
+dimensions in the space. For example,
+text vectors have dimensions equal
+to the number of distinct words in the
+corpus. For a small corpus, there isn't
+a very high dimensional space. However,
+when you look at longer documents and larger
+corpora, the dimensions become much
+larger. But it's difficult for humans
+to interpret areas bigger than three
+dimensions. So, to make these examples
+easier, we'll consider two dimensional
+spaces because they are easy to show
+on the screen.
+Remember that the math is the same
+for two-dimensional spaces to the hundred
+dimensional spaces we'll work with in
+projects in this unit.'''
+
+'''Cosine Similarity'''
+'''We often want to compare docs to
+each other. We start by converting a
+doc to a vector, then compare the vectors.
+The next question is when are two vectors
+similar? Using linear algebra concepts,
+we could say they are similar if they have
+the same length and direction. Remember that
+length is the number of unique words in
+the corpus, which isn't necessarily helpful
+when comparing docs. Next, we need to compare
+the properties of the vectors. Comparing is
+where the concept of cosine similarity
+is useful.
+If we want to know the similarity of
+two vectors, we can calculate the cosine
+similarity- the more similar the vectors,
+the smaller the angle between them. The
+cosine similarity is given by:
+cos0 = (A * B) / |A||B|
+this can also be considered the normalized
+dot product. The normalized dot product
+is where the dot product of the vectors
+A and B are divided by their lengths. So
+it's a measure of how much the vectors
+point in the same direction.'''
+
+'''Follow Along'''
+'''Now that we have an understanding
+of how to mathematically calculate
+the cosine similarity of two vectors,
+let's do this with some actual text.
+We'll create a corpus and then calculate
+the tf-idf vectors. Finally, you can
+calculate the cosine similarity with the
+scikit-learn cosine_similarity function
+from the sklearn.metrics.pairwise module.'''
+
+# create the corpus (text is available in a github repo)
+def cos():
+    # import module, open and read file
+    from urllib.request import urlopen
+    # three docs on three different subjects
+    link = 'https://raw.githubusercontent.com/nwhoffman/NLP_example_text/master/u4s1m2_similarity.txt'
+    f = urlopen(link)
+    myfile = f.read()
+    mystring = str(myfile, "utf-8")
+    # create the corpus
+    corpus = mystring.split(";")
+    # print first 300 characters for each doc
+    for i in [0, 1, 2]:
+        print("document:", i)
+        print(corpus[i][0:300])
+    # create the vectors for each doc
+    from sklearn.feature_extraction.text import TfidfVectorizer
+    # instantiate vectorizer object
+    tfidf = TfidfVectorizer(stop_words="english",
+        max_features=5000)
+    # create a vocabulary and get tfidf values per doc
+    dtm = tfidf.fit_transform(corpus)
+    import pandas as pd
+    # get feature names to use as DF column headers
+    dtm = pd.DataFrame(dtm.todense(), columns = tfidf.get_feature_names())
+    # view the feature matrix as a dataframe
+    print(dtm.head())
+    # find cosine similarity of tf-idf vectors
+    from sklearn.metrics.pairwise import cosine_similarity
+    cosine_sim = cosine_similarity(dtm)
+    # turn it into a dataframe
+    cosine_sim = pd.DataFrame(cosine_sim)
+    print(cosine_sim)
+    return "Function complete."
+
+'''With the above matrix we can see
+that each row is the similarity of the doc
+to itself (1.00) and the two
+other documents. The three docs were excerpts
+from textbooks, 0 on astronomy, 1 on biology,
+and 2 on physics. The astronomy and physics
+documents are more similar than the bio doc,
+which makes sense given the overlap in
+the two topics.'''
